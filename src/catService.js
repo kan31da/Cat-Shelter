@@ -19,3 +19,21 @@ export function addCat(cat) {
 export function getCatById(id) {
     return cats.find(cat => cat.id === id);
 }
+
+export function updateCat(id, updatedCat) {
+    const catIndex = cats.findIndex(cat => cat.id === id);
+
+    if (catIndex !== -1) {
+        const breed = getBreedById(updatedCat.breed)?.name || 'Unknown Breed';
+        cats[catIndex] = {
+            ...cats[catIndex],
+            ...updatedCat,
+            breed: breed,
+        };
+    }
+}
+
+export function deleteCat(id) {
+    const catIndex = cats.findIndex(cat => cat.id === id);
+    cats.splice(catIndex, 1);
+}
