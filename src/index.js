@@ -65,7 +65,13 @@ const server = http.createServer(async (req, res) => {
     if (req.url === '/') {
         htmlContent = await renderHomePage();
 
-    } else if (req.url === '/cats/add-cat') {
+    } else if (req.url.startsWith('/search')) {
+        const url = new URL(req.url, `http://${req.headers.host}`);
+        const searchTerm = url.searchParams.get('name');
+        const cats = getCats().filter(cat => cat.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        htmlContent = await renderHomePage(cats);
+    }
+    else if (req.url === '/cats/add-cat') {
         htmlContent = await renderAddCatPage();
 
     } else if (req.url === '/cats/add-breed') {
@@ -106,7 +112,7 @@ async function render404Page() {
     return htmlContent;
 }
 
-async function renderHomePage() {
+async function renderHomePage(cats = getCats()) {
     const htmlContent = await fs.readFile('./src/views/home/index.html', 'utf-8');
 
     // const catsHtml = cats.map(cat => `
@@ -141,7 +147,7 @@ async function renderHomePage() {
         </li>
     `;
 
-    const catsContent = `<ul>${getCats().map(catTemplate).join('\n')}</ul>`;
+    const catsContent = `<ul>${cats.map(catTemplate).join('\n')}</ul>`;
 
     return htmlContent.replace('{{cats}}', catsContent);
 }
